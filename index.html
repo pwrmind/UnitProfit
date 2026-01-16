@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор юнит-экономики психолога КПТ 2026</title>
+    <script defer src="https://cdn.jsdelivr.net"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss-browser/4.1.13/index.global.min.js"></script>
+</head>
+<body class="bg-slate-100 py-12 px-4 font-sans">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden" x-data="calculatorApp()">
+        
+        <!-- Шапка -->
+        <div class="bg-indigo-700 p-8 text-white">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight">CBT ECONOMICS 2026</h1>
+                    <p class="text-indigo-200 opacity-90 mt-1">Инструмент планирования частной практики психолога</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs uppercase tracking-widest bg-indigo-800 px-3 py-1 rounded-full">Pro Version</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+            
+            <!-- Левая колонка: Ввод данных -->
+            <div class="lg:col-span-4 p-8 bg-slate-50 border-r border-slate-200">
+                <h3 class="text-sm font-bold text-slate-400 uppercase mb-6 tracking-widest">Параметры системы</h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Бюджет на месяц (₽)</label>
+                        <input type="number" x-model.number="adBudget" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Цена клика (CPC), ₽</label>
+                        <input type="number" x-model.number="cpc" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Конверсия сайта (CR1), %</label>
+                        <input type="number" step="0.1" x-model.number="crSite" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Продажа (CR2), %</label>
+                        <input type="number" x-model.number="crSales" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <p class="text-[10px] text-slate-400 mt-1">Доля тех, кто оплатил после заявки</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-200">
+                        <label class="block text-sm font-semibold text-slate-700">Цена сессии, ₽</label>
+                        <input type="number" x-model.number="price" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">Длина курса (сессий)</label>
+                        <input type="number" x-model.number="sessions" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Правая колонка: Аналитика и Советы -->
+            <div class="lg:col-span-8 p-8">
+                
+                <!-- Виджеты главных цифр -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="p-5 bg-indigo-50 rounded-2xl border border-indigo-100">
+                        <p class="text-xs font-bold text-indigo-400 uppercase">Цена клиента (CAC)</p>
+                        <p class="text-2xl font-black text-indigo-900 mt-1" x-text="formatPrice(cac)"></p>
+                    </div>
+                    <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <p class="text-xs font-bold text-emerald-500 uppercase">Ожидаемая прибыль</p>
+                        <p class="text-2xl font-black text-emerald-900 mt-1" x-text="formatPrice(profit)"></p>
+                    </div>
+                    <div class="p-5 bg-slate-900 rounded-2xl shadow-lg">
+                        <p class="text-xs font-bold text-slate-400 uppercase">Окупаемость (ROMI)</p>
+                        <p class="text-2xl font-black text-white mt-1" x-text="romi + '%'"></p>
+                    </div>
+                </div>
+
+                <!-- Блок советов -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                        <span class="mr-2">💡</span> Стратегия и рекомендации на 2026 год
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <template x-for="tip in getTips()" :key="tip.text">
+                            <div class="flex items-start p-4 rounded-xl transition-colors" :class="tip.bg">
+                                <div class="mr-4 mt-1 text-xl" x-text="tip.icon"></div>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm" x-text="tip.title"></h4>
+                                    <p class="text-sm text-slate-600 mt-0.5" x-text="tip.text"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Таблица воронки -->
+                <div class="mt-8 overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-400 text-[10px] uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-3 px-2 font-medium">Этап воронки</th>
+                                <th class="pb-3 px-2 font-medium">Количество</th>
+                                <th class="pb-3 px-2 font-medium text-right">Эффективность</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-b border-slate-50">
+                                <td class="py-4 px-2 text-slate-600">Охват (визиты на сайт)</td>
+                                <td class="py-4 px-2 font-mono font-bold" x-text="visitors"></td>
+                                <td class="py-4 px-2 text-right text-slate-400">100%</td>
+                            </tr>
+                            <tr class="border-b border-slate-50">
+                                <td class="py-4 px-2 text-slate-600">Заявки (лиды)</td>
+                                <td class="py-4 px-2 font-mono font-bold" x-text="leads"></td>
+                                <td class="py-4 px-2 text-right font-semibold text-indigo-600" x-text="crSite + '%'"></td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-2 text-slate-600 font-bold italic text-indigo-700">Новые клиенты (оплаты)</td>
+                                <td class="py-4 px-2 font-mono font-black text-indigo-700 text-lg" x-text="clients"></td>
+                                <td class="py-4 px-2 text-right font-semibold text-emerald-600" x-text="crSales + '%'"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculatorApp() {
+            return {
+                // Исходные данные
+                adBudget: 50000,
+                cpc: 65,
+                crSite: 2.5,
+                crSales: 60,
+                price: 3500,
+                sessions: 12,
+
+                // Геттеры вычислений
+                get visitors() { return Math.floor(this.adBudget / this.cpc) || 0 },
+                get leads() { return Math.floor(this.visitors * (this.crSite / 100)) || 0 },
+                get clients() { return Math.floor(this.leads * (this.crSales / 100)) || 0 },
+                get cac() { return this.clients > 0 ? Math.floor(this.adBudget / this.clients) : 0 },
+                get ltv() { return this.price * this.sessions },
+                get totalRevenue() { return this.clients * this.ltv },
+                get profit() { return this.totalRevenue - this.adBudget },
+                get romi() { 
+                    if (this.adBudget === 0) return 0;
+                    return Math.round((this.profit / this.adBudget) * 100);
+                },
+
+                // Форматирование цен
+                formatPrice(val) {
+                    return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(val);
+                },
+
+                // Динамическая логика советов
+                getTips() {
+                    let tips = [];
+
+                    // Анализ окупаемости первой сессии
+                    if (this.cac > this.price) {
+                        tips.push({
+                            title: 'Критический CAC',
+                            text: `Привлечение клиента обходится в ${this.cac} ₽, что выше цены сессии. В 2026 году это норма, но вам нужно удерживать клиента минимум на ${Math.ceil(this.cac / this.price)} встреч, чтобы выйти в ноль.`,
+                            icon: '🚩',
+                            bg: 'bg-red-50'
+                        });
+                    } else {
+                        tips.push({
+                            title: 'Масштабируемая модель',
+                            text: 'Вы окупаете рекламу уже с первой сессии. Это отличный результат для 2026 года — можно смело увеличивать бюджет.',
+                            icon: '🚀',
+                            bg: 'bg-emerald-50'
+                        });
+                    }
+
+                    // Анализ конверсии
+                    if (this.crSite < 2) {
+                        tips.push({
+                            title: 'Слабая посадочная страница',
+                            text: 'Конверсия ниже 2% говорит о том, что оффер не попадает в боли клиента. Попробуйте добавить узкую специализацию (например, "КПТ при панических атаках").',
+                            icon: '📉',
+                            bg: 'bg-amber-50'
+                        });
+                    }
+
+                    // Рекомендация по LTV
+                    if (this.sessions < 8) {
+                        tips.push({
+                            title: 'Короткий цикл терапии',
+                            text: 'Для КПТ 8 сессий — минимум. Увеличив удержание клиента до 12 сессий, вы поднимете прибыль на 50% без вложений в рекламу.',
+                            icon: '🔄',
+                            bg: 'bg-indigo-50'
+                        });
+                    }
+
+                    // Совет по стоимости клика
+                    if (this.cpc > 100) {
+                        tips.push({
+                            title: 'Перегретый аукцион',
+                            text: 'Цена клика выше 100 ₽ съедает маржу. Рассмотрите контент-маркетинг в Telegram или работу через агрегаторы как более дешевый источник лидов.',
+                            icon: '⛽',
+                            bg: 'bg-slate-50'
+                        });
+                    }
+
+                    return tips.length > 0 ? tips : [{title: 'Стабильность', text: 'Все показатели в норме.', icon: '✅', bg: 'bg-green-50'}];
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
