@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор юнит-экономики психолога КПТ 2026</title>
-        <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS через CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Подключаем Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 py-12 px-4 font-sans">
 
@@ -42,28 +39,28 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700">Цена клика (CPC), ₽</label>
-                        <input type="number" x-model.number="cpc" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <input type="number" x-model.number="cpc" min="0.1" step="0.1" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700">Конверсия сайта (CR1), %</label>
-                        <input type="number" step="0.1" x-model.number="crSite" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <input type="number" step="0.1" x-model.number="crSite" min="0.1" max="100" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700">Продажа (CR2), %</label>
-                        <input type="number" x-model.number="crSales" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <input type="number" x-model.number="crSales" min="0.1" max="100" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
                         <p class="text-[10px] text-slate-400 mt-1">Доля тех, кто оплатил после заявки</p>
                     </div>
 
                     <div class="pt-4 border-t border-slate-200">
                         <label class="block text-sm font-semibold text-slate-700">Цена сессии, ₽</label>
-                        <input type="number" x-model.number="price" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <input type="number" x-model.number="price" min="0" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700">Длина курса (сессий)</label>
-                        <input type="number" x-model.number="sessions" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
+                        <input type="number" x-model.number="sessions" min="1" class="w-full mt-1.5 p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
             </div>
@@ -119,18 +116,18 @@
                         <tbody class="text-sm">
                             <tr class="border-b border-slate-50">
                                 <td class="py-4 px-2 text-slate-600">Охват (визиты на сайт)</td>
-                                <td class="py-4 px-2 font-mono font-bold" x-text="visitors"></td>
+                                <td class="py-4 px-2 font-mono font-bold" x-text="visitors.toLocaleString('ru-RU')"></td>
                                 <td class="py-4 px-2 text-right text-slate-400">100%</td>
                             </tr>
                             <tr class="border-b border-slate-50">
                                 <td class="py-4 px-2 text-slate-600">Заявки (лиды)</td>
-                                <td class="py-4 px-2 font-mono font-bold" x-text="leads"></td>
-                                <td class="py-4 px-2 text-right font-semibold text-indigo-600" x-text="crSite + '%'"></td>
+                                <td class="py-4 px-2 font-mono font-bold" x-text="leads.toLocaleString('ru-RU')"></td>
+                                <td class="py-4 px-2 text-right font-semibold text-indigo-600" x-text="crSiteFormatted + '%'"></td>
                             </tr>
                             <tr>
                                 <td class="py-4 px-2 text-slate-600 font-bold italic text-indigo-700">Новые клиенты (оплаты)</td>
-                                <td class="py-4 px-2 font-mono font-black text-indigo-700 text-lg" x-text="clients"></td>
-                                <td class="py-4 px-2 text-right font-semibold text-emerald-600" x-text="crSales + '%'"></td>
+                                <td class="py-4 px-2 font-mono font-black text-indigo-700 text-lg" x-text="clients.toLocaleString('ru-RU')"></td>
+                                <td class="py-4 px-2 text-right font-semibold text-emerald-600" x-text="crSalesFormatted + '%'"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -151,21 +148,45 @@
                 sessions: 12,
 
                 // Геттеры вычислений
-                get visitors() { return Math.floor(this.adBudget / this.cpc) || 0 },
-                get leads() { return Math.floor(this.visitors * (this.crSite / 100)) || 0 },
-                get clients() { return Math.floor(this.leads * (this.crSales / 100)) || 0 },
-                get cac() { return this.clients > 0 ? Math.floor(this.adBudget / this.clients) : 0 },
-                get ltv() { return this.price * this.sessions },
-                get totalRevenue() { return this.clients * this.ltv },
-                get profit() { return this.totalRevenue - this.adBudget },
+                get visitors() { 
+                    return this.cpc > 0 ? Math.floor(this.adBudget / this.cpc) : 0;
+                },
+                get leads() { 
+                    return Math.floor(this.visitors * (this.crSite / 100)) || 0;
+                },
+                get clients() { 
+                    return Math.floor(this.leads * (this.crSales / 100)) || 0;
+                },
+                get cac() { 
+                    return this.clients > 0 ? Math.floor(this.adBudget / this.clients) : 0;
+                },
+                get ltv() { 
+                    return this.price * this.sessions;
+                },
+                get totalRevenue() { 
+                    return this.clients * this.ltv;
+                },
+                get profit() { 
+                    return this.totalRevenue - this.adBudget;
+                },
                 get romi() { 
                     if (this.adBudget === 0) return 0;
                     return Math.round((this.profit / this.adBudget) * 100);
                 },
+                get crSiteFormatted() {
+                    return this.crSite.toFixed(1);
+                },
+                get crSalesFormatted() {
+                    return Math.round(this.crSales);
+                },
 
                 // Форматирование цен
                 formatPrice(val) {
-                    return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', maximumFractionDigits: 0 }).format(val);
+                    return new Intl.NumberFormat('ru-RU', { 
+                        style: 'currency', 
+                        currency: 'RUB', 
+                        maximumFractionDigits: 0 
+                    }).format(val);
                 },
 
                 // Динамическая логика советов
@@ -176,7 +197,7 @@
                     if (this.cac > this.price) {
                         tips.push({
                             title: 'Критический CAC',
-                            text: `Привлечение клиента обходится в ${this.cac} ₽, что выше цены сессии. В 2026 году это норма, но вам нужно удерживать клиента минимум на ${Math.ceil(this.cac / this.price)} встреч, чтобы выйти в ноль.`,
+                            text: `Привлечение клиента обходится в ${this.cac.toLocaleString('ru-RU')} ₽, что выше цены сессии. В 2026 году это норма, но вам нужно удерживать клиента минимум на ${Math.ceil(this.cac / this.price)} встреч, чтобы выйти в ноль.`,
                             icon: '🚩',
                             bg: 'bg-red-50'
                         });
@@ -219,7 +240,12 @@
                         });
                     }
 
-                    return tips.length > 0 ? tips : [{title: 'Стабильность', text: 'Все показатели в норме.', icon: '✅', bg: 'bg-green-50'}];
+                    return tips.length > 0 ? tips : [{
+                        title: 'Стабильность', 
+                        text: 'Все показатели в норме.', 
+                        icon: '✅', 
+                        bg: 'bg-green-50'
+                    }];
                 }
             }
         }
